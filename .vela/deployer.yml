@@ -17,11 +17,11 @@ steps:
         {{end}}
     commands:
       - echo "== DOCKER BUILD & PUSH =="
-      - echo "Environment  {{ .target_env }}"
-      - echo "Image tag    {{ .target_env }}-{{ .image_tag }}"
+      - echo "Environment  {{ .deployment_target }}"
+      - echo "Image tag    {{ .deployment_target }}-${VELA_BUILD_COMMIT:0:8}"
       - echo "Registry     451937841924.dkr.ecr.us-east-2.amazonaws.com"
       - echo "Repo         crm-platform-server"
-      - echo "Build arg    APP_ENV={{ .target_env }}"
+      - echo "Build arg    APP_ENV={{ .deployment_target }}"
       - echo "== PUSHED TO ECR (simulated) =="
 
   # this step should be executing the deployment step
@@ -37,11 +37,11 @@ steps:
           branch: [main]
         {{end}}
     commands:
-      - echo "== GITOPS DEPLOY {{ .target_env | upper }} =="
+      - echo "== GITOPS DEPLOY {{ .deployment_target | upper }} =="
       - echo "Cloning spartan-git/k8s_apps..."
-      - echo "Updating overlays/{{ .target_env }}/kustomization.yaml"
-      - echo "  image -> crm-platform-server:{{ .target_env }}-{{ .image_tag }}"
-      - echo "Commit  chore({{ .target_env }}) deploy crm-platform-server@{{ .image_tag }}"
+      - echo "Updating overlays/{{ .deployment_target }}/kustomization.yaml"
+      - echo "  image -> crm-platform-server:{{ .deployment_target }}-${VELA_BUILD_COMMIT:0:8}"
+      - echo "Commit  chore({{ .deployment_target }}) deploy crm-platform-server@${VELA_BUILD_COMMIT:0:8}"
       - echo "Author  vela-bot@spartancapital.us"
       - echo "Pushing to k8s_apps repo..."
-      - echo "== {{ .target_env | upper }} DEPLOY COMPLETE =="
+      - echo "== {{ .deployment_target | upper }} DEPLOY COMPLETE =="
