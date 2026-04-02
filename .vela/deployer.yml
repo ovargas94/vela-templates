@@ -1,0 +1,47 @@
+metadata:
+  template: true
+
+steps:
+  # docker publish step this step should generate the docker image and publish to registry
+
+  - name: docker-build-push-{{ .deployment_target }}
+    image: alpine:latest
+    ruleset:
+      if:
+        {{ if eq .deployment_target "dev" }}
+          event: [push]
+          branch: [main]
+        {{else}}
+          event: [deployment]
+          branch: [main]
+        {{end}}
+    commands:
+      - echo "== DOCKER BUILD & PUSH =="
+      - echo "Environment  {{ .target_env }}"
+      - echo "Image tag    {{ .target_env }}-{{ .image_tag }}"
+      - echo "Registry     451937841924.dkr.ecr.us-east-2.amazonaws.com"
+      - echo "Repo         crm-platform-server"
+      - echo "Build arg    APP_ENV={{ .target_env }}"
+      - echo "== PUSHED TO ECR (simulated) =="
+
+  # this step should be executing the deployment step
+  - name: deploy_step-{{ .deployment_target }}
+    image: alpine:latest
+    ruleset:
+      if:
+        {{ if eq .deployment_target "dev" }}
+          event: [push]
+          branch: [main]
+        {{else}}
+          event: [deployment]
+          branch: [main]
+        {{end}}
+    commands:
+      - echo "== GITOPS DEPLOY {{ .target_env | upper }} =="
+      - echo "Cloning spartan-git/k8s_apps..."
+      - echo "Updating overlays/{{ .target_env }}/kustomization.yaml"
+      - echo "  image -> crm-platform-server:{{ .target_env }}-{{ .image_tag }}"
+      - echo "Commit  chore({{ .target_env }}) deploy crm-platform-server@{{ .image_tag }}"
+      - echo "Author  vela-bot@spartancapital.us"
+      - echo "Pushing to k8s_apps repo..."
+      - echo "== {{ .target_env | upper }} DEPLOY COMPLETE =="
