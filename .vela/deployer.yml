@@ -13,7 +13,7 @@ steps:
           branch: [main]
         {{else}}
           event: [deployment]
-          branch: [main]
+          target: [ "{{ .deployment_target }}" ]
         {{end}}
     commands:
       - echo "== DOCKER BUILD & PUSH =="
@@ -34,7 +34,7 @@ steps:
           branch: [main]
         {{else}}
           event: [deployment]
-          branch: [main]
+          target: [ "{{ .deployment_target }}" ]
         {{end}}
     commands:
       - echo "== GITOPS DEPLOY {{ .deployment_target | upper }} =="
